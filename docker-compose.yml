@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  db:
+    image: mysql:8
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: produtosdb
+    ports:
+      - "3306:3306"
+    networks:
+      - app-net
+
+  app:
+    image: projeto-de-cadastro-de-produtos
+    container_name: cadastro_produtos
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/produtosdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - app-net
+
+networks:
+  app-net:
