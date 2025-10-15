@@ -1,5 +1,8 @@
 package CadastroDeProduto.Produto.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,8 +11,12 @@ import CadastroDeProduto.Produto.Repository.ProdutoRepository;
 
 @Service
 public class ProdutoService {
-  @Autowired
-  private ProdutoRepository produtoRepository;
+ 
+  private final ProdutoRepository produtoRepository;
+
+  public ProdutoService(ProdutoRepository produtoRepository) {
+    this.produtoRepository = produtoRepository;
+  }
 
   public ProdutoModel salvarProduto(ProdutoModel produto) {
 
@@ -17,41 +24,26 @@ public class ProdutoService {
     double preco = produto.getPreco();
     int quantidade = produto.getQuantidade();
 
-    if (nome.trim().isEmpty() || nome == null) {
-      System.out.println("Nome do produto não pode estar vazio");
+    if (nome == null || nome.trim().isEmpty()) {
+      throw new IllegalArgumentException("Nome do produto não pode estar vazio");
     } else if (preco <= 0) {
-      System.out.println("O preço não pode ser menor ou igual a 0");
+      throw new IllegalArgumentException("O preço não pode ser menor ou igual a 0");
     } else if (quantidade == 0) {
-      System.out.println("A quantidade não pode ser 0");
+      throw new IllegalArgumentException("A quantidade não pode ser 0");
     } else if (produtoRepository.existsByNome(nome)) {
-
-      System.out.println("Produto já cadastrado");
-    } else {
-      System.out.println("Nome:" + nome);
-      System.out.println("Preço:" + preco);
-      System.out.println("Qauntidade:" + quantidade);
-      produtoRepository.save(produto);
-
-      System.out.println("Produto cadastrado com sucesso");
-      return produto;
+      throw new IllegalStateException("Produto já cadastrado");
     }
-    return null;
-
+    
+    return produtoRepository.save(produto);
   }
 
   public ProdutoModel buscarProduto(Long id) {
-
-    if (produtoRepository.existsById(id)) {
-      System.out.println("Produto encontrado");
-      return produtoRepository.findById(id).orElse(null);
-
-    }
-
-    else {
-
-      return null;
-    }
-
+   
+    return produtoRepository.findById(id).orElse(null);
+  }
+  
+  public List<ProdutoModel> listarTodosProdutos(){
+      return produtoRepository.findAll();
   }
   
 }
